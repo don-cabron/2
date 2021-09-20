@@ -1,0 +1,49 @@
+---
+- hosts: "all"
+  vars:
+    PROJECT_HOME: "/root/myapp"
+  tasks:
+  - name: "Install pip via apt"
+    ansible.builtin.apt:
+      name: "python3-pip"
+      state: "latest"
+      update_cache: true
+
+  - name: "Install virtualenv via apt"
+    ansible.builtin.apt: 
+      name: "python3-venv"
+      state: "latest"
+      update_cache: true
+
+  - name: "Create virtualenv"
+    command: python3 -m  venv "{{ PROJECT_HOME }}/venv"
+
+  - name: "Install emoji in venv"
+    ansible.builtin.pip:
+      name: "emoji"
+      virtualenv: "{{ PROJECT_HOME }}/venv"
+
+  - name: "Install flask via pip"
+    ansible.builtin.pip:
+      name: "flask"
+      virtualenv: "{{ PROJECT_HOME }}/venv"
+
+  - name: "Copy app to remote machine"
+    ansible.builtin.copy:
+      src: "main.py"
+      dest: "{{ PROJECT_HOME }}/main.py"
+
+  - name: "Copy start script"
+    ansible.builtin.copy:
+      src: "start.sh"
+      dest: "{{ PROJECT_HOME }}/start.sh"
+
+  - name: "Start app"
+    shell: nohup sh {{ PROJECT_HOME }}/start.sh {{ PROJECT_HOME }} &
+
+  - name: "Add start script to cron"
+    ansible.builtin.cron:
+      name: "job for a reboot"
+      special_time: reboot
+      job: /bin/sh {{ PROJECT_HOME }}/start.sh {{ PROJECT_HOME }}
+...
