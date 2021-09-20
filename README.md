@@ -10,8 +10,6 @@
 
 - ISO of Debian 10.10 you can download [here][deb_iso].
 
-- _Describe installation_
-
 - Then you need configure NAT or bridge between host and guest OS.
 
    > Note: In my case, I had to set NAT and bridge in the same time to get connection in local network and Internet.
